@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ijro intizomi - Idoralararo yagona elektron tizimi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <script src="/static/captcha-overlay.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+        .menu-button:hover {
+            background-color: #f3f4f6;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+        .logo-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.2;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 16px;
+            margin-top: 4px;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .search-dropdown.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        .search-dropdown-input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        .search-dropdown-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .search-dropdown-button {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-dropdown-button:hover {
+            background: #2563eb;
+        }
+        .search-input {
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            padding: 8px 40px 8px 16px;
+            font-size: 14px;
+            width: 300px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+        .search-button {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+        .search-button:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        @media (max-width: 768px) {
+            .logo-text {
+                display: none;
+            }
+            .header {
+                padding: 8px 12px;
+            }
+            .search-input {
+                width: 200px;
+            }
+            .header-right {
+                gap: 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .search-input {
+                width: 150px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo" class="logo">
+                <div class="logo-text">
+                    <div class="logo-title">Ijro intizomi</div>
+                    <div class="logo-subtitle">Idoralararo yagona elektron tizimi</div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="PDF fayl nomini kiriting"
+                    id="searchInput"
+                    onkeypress="handleSearch(event)"
+                >
+                <button class="search-button" onclick="toggleSearchDropdown()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <div class="search-dropdown" id="searchDropdown">
+                    <input 
+                        type="text" 
+                        class="search-dropdown-input" 
+                        placeholder="PDF fayl nomini kiriting"
+                        id="dropdownSearchInput"
+                        onkeypress="handleDropdownSearch(event)"
+                    >
+                    <button class="search-dropdown-button" onclick="performDropdownSearch()">
+                        Qidirish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const fileName = searchInput.value.trim();
+            
+            if (fileName) {
+                // PDF fayl nomini tozalash (faqat raqam va harflar)
+                const cleanFileName = fileName.replace(/[^a-zA-Z0-9]/g, '');
+                if (cleanFileName) {
+                    window.location.href = `/d/${cleanFileName}`;
+                } else {
+                    alert('Iltimos, to\'g\'ri fayl nomini kiriting');
+                }
+            } else {
+                alert('Iltimos, fayl nomini kiriting');
+            }
+        }
+
+        function toggleSearchDropdown() {
+            const dropdown = document.getElementById('searchDropdown');
+            const dropdownInput = document.getElementById('dropdownSearchInput');
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            } else {
+                dropdown.classList.add('show');
+                // Dropdown ochilganda input ga fokus qo'yish
+                setTimeout(() => {
+                    dropdownInput.focus();
+                }, 100);
+            }
+        }
+
+        function handleDropdownSearch(event) {
+            if (event.key === 'Enter') {
+                performDropdownSearch();
+            }
+        }
+
+        function performDropdownSearch() {
+            const searchInput = document.getElementById('dropdownSearchInput');
+            const fileName = searchInput.value.trim();
+            
+            if (fileName) {
+                // PDF fayl nomini tozalash (faqat raqam va harflar)
+                const cleanFileName = fileName.replace(/[^a-zA-Z0-9]/g, '');
+                if (cleanFileName) {
+                    window.location.href = `/d/${cleanFileName}`;
+                } else {
+                    alert('Iltimos, to\'g\'ri fayl nomini kiriting');
+                }
+            } else {
+                alert('Iltimos, fayl nomini kiriting');
+            }
+        }
+
+        // Dropdown tashqarisiga bosilganda yopish
+        document.addEventListener('click', function(event) {
+            const searchContainer = document.querySelector('.search-container');
+            const dropdown = document.getElementById('searchDropdown');
+            
+            if (!searchContainer.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Sahifa yuklanganda qidiruv maydoniga fokus qo'yish
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').focus();
+        });
+    </script>
+</body>
+</html>
+

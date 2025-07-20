@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xavfsizlik tekshiruvi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .captcha-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: none;
+            max-width: 400px;
+            text-align: center;
+        }
+        .loading {
+            display: none;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="captcha-container">
+        <form id="captchaForm">
+            <div id="recaptcha-container"></div>
+        </form>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <div class="loading" id="loading">Tekshirilmoqda...</div>
+    </div>
+
+    <script>
+        let captchaVerified = false;
+        let captchaWidgetId = null;
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const captchaForm = document.getElementById('captchaForm');
+
+        // reCAPTCHA API yuklangandan keyin chaqiriladigan funksiya
+        function onRecaptchaLoad() {
+            console.log('reCAPTCHA API loaded, rendering widget...');
+            captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                'sitekey': '6LfmMokrAAAAAFwjS5ZjBsBgwZcjTRlF-05g20FG',
+                'callback': onCaptchaSuccess,
+                'expired-callback': onCaptchaExpired,
+                'error-callback': onCaptchaError
+            });
+        }
+
+        // reCAPTCHA callback funksiyasi
+        function onCaptchaSuccess(token) {
+            console.log('Captcha success callback called with token:', token);
+            captchaVerified = true;
+            hideError();
+            submitCaptcha(token);
+        }
+
+        // reCAPTCHA expired callback
+        function onCaptchaExpired() {
+            console.log('Captcha expired callback called');
+            captchaVerified = false;
+            showError('Captcha muddati tugadi. Iltimos, qayta urinib ko\'ring.');
+        }
+
+        // reCAPTCHA error callback
+        function onCaptchaError() {
+            console.log('Captcha error callback called');
+            captchaVerified = false;
+            showError('Captcha yuklanishida xatolik. Iltimos, sahifani yangilang.');
+        }
+
+        // Captcha submit funksiyasi
+        async function submitCaptcha(captchaResponse) {
+            console.log('submitCaptcha called with:', captchaResponse);
+            
+            if (!captchaResponse) {
+                showError('Captcha javob olinmadi. Iltimos, qayta urinib ko\'ring.');
+                return;
+            }
+
+            // Loading holatini ko'rsatish
+            loading.style.display = 'block';
+            hideError();
+
+            try {
+                console.log('Sending request to /verify_captcha');
+                const response = await fetch('/verify_captcha', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'g-recaptcha-response': captchaResponse
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response result:', result);
+
+                if (response.ok && result.success) {
+                    // Muvaffaqiyatli tekshiruv - bosh sahifaga yo'naltirish
+                    console.log('Captcha verified successfully, redirecting to:', getRedirectUrl());
+                    window.location.href = getRedirectUrl();
+                } else {
+                    console.error('Captcha verification failed:', result);
+                    showError(result.error || 'Captcha tekshiruvida xatolik yuz berdi.');
+                    if (captchaWidgetId !== null) {
+                        grecaptcha.reset(captchaWidgetId);
+                    }
+                    captchaVerified = false;
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showError('Server bilan bog\'lanishda xatolik: ' + error.message);
+                if (captchaWidgetId !== null) {
+                    grecaptcha.reset(captchaWidgetId);
+                }
+                captchaVerified = false;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function getRedirectUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            return redirect ? decodeURIComponent(redirect) : '/';
+        }
+    </script>
+</body>
+</html>
+
