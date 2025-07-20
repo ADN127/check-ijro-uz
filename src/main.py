@@ -34,7 +34,7 @@ def view_pdf(filename):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ filename }} - PDF Ko'ruvchi</title>
+        <title>{{ filename }} - Ижро интизоми</title>
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
         <script src="/static/captcha-overlay.js"></script>
@@ -139,83 +139,6 @@ def view_pdf(filename):
                     padding: 8px 12px;
                 }
             }
-            .search-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                border-bottom: 1px solid #e5e7eb;
-                z-index: 1000;
-                height: 64px;
-                transform: translateY(-100%);
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-            .search-overlay.show {
-                transform: translateY(0);
-                opacity: 1;
-                visibility: visible;
-            }
-            .search-overlay-content {
-                width: 100%;
-                height: 64px;
-                display: flex;
-                align-items: center;
-                padding: 0 24px;
-            }
-            .search-form {
-                width: 100%;
-            }
-            .search-input-container {
-                position: relative;
-                width: 100%;
-                display: flex;
-                align-items: center;
-            }
-            .search-icon-left {
-                position: absolute;
-                left: 24px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #6b7280;
-                z-index: 1;
-            }
-            .search-overlay-input {
-                width: 100%;
-                padding-left: 64px;
-                padding-right: 64px;
-                height: 64px;
-                border: none;
-                outline: none;
-                font-size: 18px;
-                background: transparent;
-                color: #374151;
-            }
-            .search-overlay-input::placeholder {
-                color: #6b7280;
-            }
-            .search-overlay-close {
-                position: absolute;
-                right: 24px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 8px;
-                border-radius: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #6b7280;
-                transition: color 0.2s;
-            }
-            .search-overlay-close:hover {
-                color: #374151;
-            }
         </style>
     </head>
     <body>
@@ -237,39 +160,12 @@ def view_pdf(filename):
                 </div>
             </div>
             <div class="header-right">
-                <button class="search-button" onclick="toggleSearchOverlay()">
+                <button class="search-button">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
                 </button>
-            </div>
-        </div>
-
-        <!-- Search Overlay -->
-        <div class="search-overlay" id="searchOverlay">
-            <div class="search-overlay-content">
-                <form onsubmit="handleOverlaySearch(event)" class="search-form">
-                    <div class="search-input-container">
-                        <svg class="search-icon-left" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                        <input 
-                            type="text" 
-                            class="search-overlay-input" 
-                            placeholder="Файл номини киритинг"
-                            id="overlaySearchInput"
-                            autocomplete="off"
-                        >
-                        <button type="button" class="search-overlay-close" onclick="closeSearchOverlay()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
         <div class="loading" id="loading">PDF юкланмоқда...</div>
@@ -281,67 +177,6 @@ def view_pdf(filename):
         </iframe>
         
         <script>
-            let isSearchOpen = false;
-
-            function toggleSearchOverlay() {
-                const overlay = document.getElementById('searchOverlay');
-                const overlayInput = document.getElementById('overlaySearchInput');
-                
-                isSearchOpen = !isSearchOpen;
-                
-                if (isSearchOpen) {
-                    overlay.classList.add('show');
-                    // Overlay ochilganda input ga fokus qo'yish
-                    setTimeout(() => {
-                        overlayInput.focus();
-                    }, 100);
-                } else {
-                    overlay.classList.remove('show');
-                }
-            }
-
-            function closeSearchOverlay() {
-                const overlay = document.getElementById('searchOverlay');
-                overlay.classList.remove('show');
-                isSearchOpen = false;
-            }
-
-            function handleOverlaySearch(event) {
-                event.preventDefault();
-                const searchInput = document.getElementById('overlaySearchInput');
-                const fileName = searchInput.value.trim();
-                
-                if (fileName) {
-                    // PDF fayl nomini tozalash (faqat raqam va harflar)
-                    const cleanFileName = fileName.replace(/[^a-zA-Z0-9]/g, '');
-                    if (cleanFileName) {
-                        window.location.href = `/d/${cleanFileName}`;
-                    } else {
-                        alert('Iltimos, to\'g\'ri fayl nomini kiriting');
-                    }
-                } else {
-                    alert('Файл номини киритинг');
-                }
-            }
-
-            // Escape tugmasi bosilganda overlay ni yopish
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && isSearchOpen) {
-                    closeSearchOverlay();
-                }
-            });
-
-            // Sahifa yuklanganda
-            document.addEventListener('DOMContentLoaded', function() {
-                // Search overlay tashqarisiga bosilganda yopish
-                const overlay = document.getElementById('searchOverlay');
-                overlay.addEventListener('click', function(event) {
-                    if (event.target === overlay) {
-                        closeSearchOverlay();
-                    }
-                });
-            });
-
             document.getElementById('pdf-viewer').onload = function() {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('pdf-viewer').style.display = 'block';
