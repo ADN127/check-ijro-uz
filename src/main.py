@@ -306,7 +306,7 @@ def view_pdf(filename):
                             <input 
                                 type="text" 
                                 class="search-overlay-input" 
-                                placeholder="Файл номини киритинг"
+                                placeholder="Хужжат рақамини киритинг"
                                 id="overlaySearchInput"
                                 autocomplete="off"
                             >
