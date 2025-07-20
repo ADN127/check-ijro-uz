@@ -103,25 +103,50 @@
             visibility: visible;
         }
         .search-overlay-content {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            height: 64px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .search-form {
+            width: 100%;
+        }
+        .search-input-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .search-icon-left {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            z-index: 1;
         }
         .search-overlay-input {
-            flex: 1;
+            width: 100%;
+            padding-left: 64px;
+            padding-right: 64px;
+            height: 64px;
             border: none;
             outline: none;
-            font-size: 16px;
-            padding: 8px 0;
+            font-size: 18px;
             background: transparent;
             color: #374151;
         }
         .search-overlay-input::placeholder {
-            color: #9ca3af;
+            color: #6b7280;
         }
         .search-overlay-close {
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
@@ -131,9 +156,9 @@
             align-items: center;
             justify-content: center;
             color: #6b7280;
+            transition: color 0.2s;
         }
         .search-overlay-close:hover {
-            background-color: #f3f4f6;
             color: #374151;
         }
         .search-input {
@@ -211,13 +236,6 @@
         </div>
         <div class="header-right">
             <div class="search-container">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    placeholder="PDF fayl nomini kiriting"
-                    id="searchInput"
-                    onkeypress="handleSearch(event)"
-                >
                 <button class="search-button" onclick="toggleSearchOverlay()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
@@ -231,77 +249,58 @@
     <!-- Search Overlay -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-overlay-content">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input 
-                type="text" 
-                class="search-overlay-input" 
-                placeholder="Hujjat raqamini kiriting"
-                id="overlaySearchInput"
-                onkeypress="handleOverlaySearch(event)"
-            >
-            <button class="search-overlay-close" onclick="closeSearchOverlay()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+            <form onsubmit="handleOverlaySearch(event)" class="search-form">
+                <div class="search-input-container">
+                    <svg class="search-icon-left" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="search-overlay-input" 
+                        placeholder="Fayl nomini kiriting"
+                        id="overlaySearchInput"
+                        autocomplete="off"
+                    >
+                    <button type="button" class="search-overlay-close" onclick="closeSearchOverlay()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        function handleSearch(event) {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        }
-
-        function performSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const fileName = searchInput.value.trim();
-            
-            if (fileName) {
-                // PDF fayl nomini tozalash (faqat raqam va harflar)
-                const cleanFileName = fileName.replace(/[^a-zA-Z0-9]/g, '');
-                if (cleanFileName) {
-                    window.location.href = `/d/${cleanFileName}`;
-                } else {
-                    alert('Iltimos, to\'g\'ri fayl nomini kiriting');
-                }
-            } else {
-                alert('Iltimos, fayl nomini kiriting');
-            }
-        }
+        let isSearchOpen = false;
 
         function toggleSearchOverlay() {
             const overlay = document.getElementById('searchOverlay');
             const overlayInput = document.getElementById('overlaySearchInput');
             
-            if (overlay.classList.contains('show')) {
-                overlay.classList.remove('show');
-            } else {
+            isSearchOpen = !isSearchOpen;
+            
+            if (isSearchOpen) {
                 overlay.classList.add('show');
                 // Overlay ochilganda input ga fokus qo'yish
                 setTimeout(() => {
                     overlayInput.focus();
                 }, 100);
+            } else {
+                overlay.classList.remove('show');
             }
         }
 
         function closeSearchOverlay() {
             const overlay = document.getElementById('searchOverlay');
             overlay.classList.remove('show');
+            isSearchOpen = false;
         }
 
         function handleOverlaySearch(event) {
-            if (event.key === 'Enter') {
-                performOverlaySearch();
-            }
-        }
-
-        function performOverlaySearch() {
+            event.preventDefault();
             const searchInput = document.getElementById('overlaySearchInput');
             const fileName = searchInput.value.trim();
             
@@ -320,14 +319,20 @@
 
         // Escape tugmasi bosilganda overlay ni yopish
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
+            if (event.key === 'Escape' && isSearchOpen) {
                 closeSearchOverlay();
             }
         });
 
-        // Sahifa yuklanganda qidiruv maydoniga fokus qo'yish
+        // Sahifa yuklanganda
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('searchInput').focus();
+            // Search overlay tashqarisiga bosilganda yopish
+            const overlay = document.getElementById('searchOverlay');
+            overlay.addEventListener('click', function(event) {
+                if (event.target === overlay) {
+                    closeSearchOverlay();
+                }
+            });
         });
     </script>
 </body>
