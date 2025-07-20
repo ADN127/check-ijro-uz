@@ -154,8 +154,8 @@ def view_pdf(filename):
                 <div class="logo-container">
                     <img src="/static/logo.png" alt="Logo" class="logo">
                     <div class="logo-text">
-                        <div class="logo-title">Ijro intizomi</div>
-                        <div class="logo-subtitle">Idoralararo yagona elektron tizimi</div>
+                        <div class="logo-title">Ижро интизоми</div>
+                        <div class="logo-subtitle">Идоралараро ягона электрон тизими</div>
                     </div>
                 </div>
             </div>
@@ -420,8 +420,8 @@ def admin_page():
                 <div class="logo-container">
                     <img src="/static/logo.png" alt="Logo" class="logo">
                     <div class="logo-text">
-                        <div class="logo-title">Ijro intizomi</div>
-                        <div class="logo-subtitle">Idoralararo yagona elektron tizimi</div>
+                        <div class="logo-title">Ижро интизоми</div>
+                        <div class="logo-subtitle">Идоралараро ягона электрон тизими</div>
                     </div>
                 </div>
             </div>
